@@ -1,0 +1,37 @@
+import './globals.css'
+
+import type { Metadata } from 'next'
+import { Geist } from 'next/font/google'
+
+import { Toaster } from '@/components/ui/sonner'
+import { ReactQueryProvider } from '@/lib/react-query-provider'
+
+const geist = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist',
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+})
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Financial Management',
+    default: 'Financial Management',
+  },
+  description: 'Financial Management, Budgeting, and Tracking',
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en" className={geist.className}>
+      <body>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+
+        <Toaster />
+      </body>
+    </html>
+  )
+}
