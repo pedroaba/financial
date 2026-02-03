@@ -46,19 +46,16 @@ src/
 │   ├── infra/              # HTTP (Hono), DB (Drizzle), auth, middlewares
 │   └── index.ts            # App Hono + rotas + middlewares
 ├── app/                    # Next.js App Router
-│   ├── (app)/              # Rotas autenticadas: dashboard, expenses, etc.
-│   ├── (auth)/             # login, signup
+│   ├── (app)/              # Rotas autenticadas
+│   ├── (auth)/             # Login e signup
 │   ├── api/[[...route]]/   # Proxy para a API Hono
 │   ├── layout.tsx
 │   └── globals.css
 ├── components/             # Componentes reutilizáveis e UI (shadcn)
-│   ├── ui/                 # Primitivos (Button, Card, Dialog, etc.)
-│   ├── app-shell.tsx
-│   ├── app-sidebar.tsx
-│   ├── page.tsx            # Page / PageHeader (composition)
-│   └── user-menu.tsx
+│   ├── ui/                 # Primitivos de UI
+│   └── ...                 # Layout e componentes compartilhados
 ├── http/                   # Cliente HTTP: funções que chamam a API (fetch)
-├── lib/                    # auth-client, auth-server, react-query, utils
+├── lib/                    # Auth client/server, React Query, utils
 ├── shared/                 # Schemas Zod compartilhados (front + API)
 ├── hooks/
 ├── utils/
@@ -69,7 +66,7 @@ src/
 - **`api/`**: contém toda a lógica de backend (domain, core, infra). O ponto de entrada é `api/index.ts`, que é montado em `app/api/[[...route]]/route.ts`, então todas as requisições a `/api/*` são tratadas pelo Hono.
 - **`app/`**: rotas, layouts e páginas do Next.js. Route groups `(app)` e `(auth)` não alteram a URL; apenas organizam layout e proteção (ex.: layout de `(app)` exige sessão).
 - **`components/`**: componentes globais (shell, sidebar, page) e `ui/` com os primitivos do shadcn.
-- **`http/`**: uma função por “ação” da API (ex.: `changeDisplayName`), usando `fetch` e `credentials: 'include'`.
+- **`http/`**: funções que chamam a API (uma por ação), com `fetch` e `credentials: 'include'`.
 - **`shared/schemas/`**: schemas Zod usados tanto na validação da API quanto no frontend (tipos e contratos únicos).
 
 ---
@@ -82,7 +79,7 @@ src/
 - **Qualidade de código**:
   - **ESLint**: `eslint-config-next` (core-web-vitals + TypeScript), Prettier e `eslint-plugin-simple-import-sort` (ordem de imports como erro) — [eslint.config.mjs](eslint.config.mjs).
   - **Prettier**: printWidth 80, tabWidth 2, singleQuote, trailingComma all, arrowParens always, semi false.
-- **Testes**: [Vitest](https://vitest.dev) (`npm run test` / `npm run test:watch`); testes em `*.test.ts` (ex.: [src/lib/calculations.test.ts](src/lib/calculations.test.ts)).
+- **Testes**: [Vitest](https://vitest.dev) (`npm run test` / `npm run test:watch`); testes em `*.test.ts`.
 - **Banco e ambiente**: PostgreSQL 17 via [docker-compose.yml](docker-compose.yml); variáveis em [src/api-env.ts](src/api-env.ts) (API) e [src/env.ts](src/env.ts) (frontend).
 - **Scripts**: `dev`, `build`, `start`, `lint`, `test`, `db:generate`, `db:migrate`, `db:push`, `db:studio`, `db:seed`.
 
@@ -99,47 +96,20 @@ src/
 ## Frontend
 
 - **Framework**: [Next.js](https://nextjs.org) 16 com App Router e [React](https://react.dev) 19; [React Compiler](https://react.dev/learn/react-compiler) ativado em [next.config.ts](next.config.ts).
-- **Rotas**: Route groups `(app)` (área autenticada) e `(auth)` (login/signup). O layout [src/app/(app)/layout.tsx](src/app/(app)/layout.tsx) valida sessão no servidor e redireciona para `/login` se não autenticado.
+- **Rotas**: Route groups `(app)` (área autenticada) e `(auth)` (login/signup). O layout de `(app)` valida sessão no servidor e redireciona para login se não autenticado. Listagem completa de rotas da API em **Scalar** (`/api/docs`).
 - **UI e estilo**:
   - [shadcn/ui](https://ui.shadcn.com) (estilo **new-york**, base **zinc**, CSS variables, RSC + TSX) — [components.json](components.json); ícones [Lucide](https://lucide.dev).
-  - Componentes em `src/components/ui/` (Radix + Tailwind); layout em `src/components/` (ex.: [app-shell](src/components/app-shell.tsx), [app-sidebar](src/components/app-sidebar.tsx), [user-menu](src/components/user-menu.tsx)).
+  - Componentes em `src/components/ui/` (Radix + Tailwind); layout e componentes compartilhados em `src/components/`.
   - [Tailwind CSS](https://tailwindcss.com) v4 em [src/app/globals.css](src/app/globals.css): `@import "tailwindcss"`, `tw-animate-css`, `tailwind-scrollbar`, tema com variáveis (radius, cores semânticas).
-- **Formulários**: [React Hook Form](https://react-hook-form.com) + `@hookform/resolvers` (Zod) + componentes Form do shadcn; validação com Zod no cliente (ex.: [display-name-edit.tsx](src/app/(app)/account-settings/general/_components/display-name-edit.tsx)).
+- **Formulários**: [React Hook Form](https://react-hook-form.com) + `@hookform/resolvers` (Zod) + componentes Form do shadcn; validação com Zod no cliente.
 - **Dados e chamadas**: [TanStack React Query](https://tanstack.com/query/latest) em [src/lib/react-query-provider.tsx](src/lib/react-query-provider.tsx); funções em `src/http/*` usam `fetch` com `credentials: 'include'` para a API em `NEXT_PUBLIC_API_URL`.
 - **Autenticação**: [better-auth](https://www.better-auth.com) no cliente (`authClient.useSession()` etc.) em [src/lib/auth-client.ts](src/lib/auth-client.ts).
 - **Padrões**:
-  - **Composition (Compound Components)**: componentes compostos são exportados como um único objeto com subcomponentes nomeados (ex.: `SettingsCard.Root`, `SettingsCard.Content`, `Page.Root`, `PageHeader.Title`). Cada subcomponente estende `ComponentProps` do elemento base e o uso no JSX fica declarativo, ex.: `<SettingsCard.Root><SettingsCard.Content>...</SettingsCard.Content></SettingsCard.Root>`. Exemplos: [settings-card.tsx](src/app/(app)/account-settings/_components/settings-card.tsx) (Root, Content, Header, Title, Description, Footer, Action, Form, etc.) e [page.tsx](src/components/page.tsx) (Page.Root/Content, PageHeader.Root/Title/Description).
-  - Componentes de página/feature ficam em `_components` dentro da rota (ex.: `account-settings/general/_components/`).
+  - **Composition (Compound Components)**: componentes compostos são exportados como um único objeto com subcomponentes nomeados (ex.: `Card.Root`, `Card.Content`, `Card.Header`). Cada subcomponente estende `ComponentProps` do elemento base; o uso no JSX fica declarativo e flexível. Ver `src/components/page.tsx` e componentes em `_components` das rotas.
+  - Componentes de página/feature ficam em `_components` dentro da rota.
   - Client components com `'use client'` quando usam hooks ou interatividade; Server Components por padrão.
   - Feedback: [Sonner](https://sonner.emilkowal.ski) para toasts; Spinner em botões de submit.
 - **Outros**: [Recharts](https://recharts.org) para gráficos; [Motion](https://motion.dev) para animações; [date-fns](https://date-fns.org); [react-day-picker](https://daypicker.dev) em calendários.
-
-### Estrutura de rotas (App Router)
-
-```mermaid
-flowchart LR
-  subgraph auth [Route group: auth]
-    login["/login"]
-    signup["/signup"]
-  end
-  subgraph appGroup [Route group: app - autenticado]
-    dashboard["/dashboard"]
-    expenses["/expenses"]
-    categories["/categories"]
-    investments["/investments"]
-    investmentsBucket["/investments/[bucketId]"]
-    accountSettings["/account-settings"]
-    accountGeneral["/account-settings/general"]
-    accountSecurity["/account-settings/security"]
-  end
-  root["/"] --> auth
-  root --> appGroup
-  appGroup --> accountSettings
-  accountSettings --> accountGeneral
-  accountSettings --> accountSecurity
-```
-
-As pastas `(app)` e `(auth)` são route groups (não aparecem na URL). O layout de `(app)` chama `getSessionForServer()` e redireciona para `/login` se não houver sessão.
 
 ### Fluxo de uma ação no frontend
 
@@ -151,19 +121,19 @@ sequenceDiagram
   participant UseCase as Use Case
   participant Repo as Repository
 
-  Page->>Http: changeDisplayName(params)
+  Page->>Http: action(params)
   Http->>API: POST /api/... (credentials: include)
   API->>API: Valida body (Zod/OpenAPI)
   API->>API: requireAuth
   API->>UseCase: new UseCase(repo).execute(...)
-  UseCase->>Repo: findById / update
-  Repo->>UseCase: User ou null
+  UseCase->>Repo: findById / update / etc.
+  Repo->>UseCase: entidade ou null
   UseCase-->>API: Either Left/Right
   API-->>Http: 200 ou 4xx + JSON
   Http-->>Page: resultado ou throw
 ```
 
-A página usa React Hook Form; no submit chama uma função de `src/http/*`, que faz `fetch` para `/api/*`. A API valida, aplica auth, executa o use case (que usa repositório Drizzle) e devolve status + JSON.
+A página chama uma função de `src/http/*`, que faz `fetch` para `/api/*`. A API valida o body, aplica auth, executa o use case (com repositório injetado) e devolve status + JSON.
 
 ---
 
@@ -172,13 +142,13 @@ A página usa React Hook Form; no submit chama uma função de `src/http/*`, que
 - **API**: [Hono](https://hono.dev) com [OpenAPIHono](https://hono.dev/docs/openapi) em [src/api/index.ts](src/api/index.ts), exposta via Next.js em [src/app/api/[[...route]]/route.ts](src/app/api/[[...route]]/route.ts) (GET, POST, PUT, DELETE, PATCH, etc.). Base path: `/api`.
 - **Autenticação**: better-auth em [src/api/infra/auth/index.ts](src/api/infra/auth/index.ts) com adapter Drizzle; email/senha e GitHub; rotas `/auth/*` e `/sign-up/*` delegadas ao handler do auth; middleware de sessão preenche `user` e `session` no contexto; rotas protegidas usam [requireAuth](src/api/infra/middlewares/auth.ts).
 - **Arquitetura (Clean/DDD)**:
-  - **Domain** (`src/api/domain/`): entidades em `enterprise/entities` (ex.: [User](src/api/domain/enterprise/entities/user.ts)); interfaces de repositório e use cases em `application/` (ex.: [user-repository](src/api/domain/application/repositories/user-repository.ts), [change-display-name](src/api/domain/application/use-case/change-display-name.ts)).
-  - **Core** (`src/api/core/`): tipo [Either](src/api/core/either.ts) (Left/Right) para erros tipados; base [Entity](src/api/core/entities/entity.ts) e `UniqueEntityID`; erros de aplicação (`UseCaseError`, `NotAllowedError`, `ResourceNotFoundError`).
-  - **Infra** (`src/api/infra/`): HTTP (handlers Hono + rotas OpenAPI), DB (Drizzle), auth e middlewares; repositórios concretos (ex.: [DrizzleUserRepository](src/api/infra/database/drizzle/repositories/drizzle-user.ts)) e mappers domain ↔ persistência.
+  - **Domain** (`src/api/domain/`): entidades em `enterprise/entities`; interfaces de repositório e use cases em `application/` (repositories, use-case).
+  - **Core** (`src/api/core/`): tipo Either (Left/Right) para erros tipados; base Entity e UniqueEntityID; erros de aplicação (UseCaseError, NotAllowedError, ResourceNotFoundError).
+  - **Infra** (`src/api/infra/`): HTTP (handlers Hono + rotas OpenAPI), DB (Drizzle), auth e middlewares; implementações de repositório e mappers entre persistência e domínio.
 - **Fluxo típico**: Handler valida body com Zod/OpenAPI → instancia use case com repositório Drizzle → `execute()` retorna `Either`; em `Left` mapeia para status HTTP (403, 404, etc.) e JSON padronizado; em `Right` retorna 200 com corpo definido.
 - **Validação e contratos**: Schemas Zod em `src/shared/schemas/`; `@hono/zod-openapi` para request/response e geração OpenAPI.
 - **Documentação**: [Scalar](https://github.com/scalar/scalar) em `/api/docs`; spec OpenAPI em `/api/openapi.json`.
-- **Banco**: PostgreSQL; [Drizzle ORM](https://orm.drizzle.team) com schema em [src/api/infra/database/drizzle/schema.ts](src/api/infra/database/drizzle/schema.ts); migrations com drizzle-kit em `src/api/infra/database/drizzle/migrations`; [drizzle.config.ts](drizzle.config.ts) com dialect `postgresql` e `casing: 'snake_case'`. Tabelas: Better Auth (users, sessions, accounts, verifications) e domínio financeiro (categories, expenses, investment buckets/transactions), multi-tenant por `userId`.
+- **Banco**: PostgreSQL; [Drizzle ORM](https://orm.drizzle.team) com schema em `src/api/infra/database/drizzle/`; migrations com drizzle-kit; [drizzle.config.ts](drizzle.config.ts) com dialect `postgresql` e `casing: 'snake_case'`. Tabelas de auth (Better Auth) e do domínio financeiro, multi-tenant por `userId`.
 
 ### Camadas da API (Clean Architecture)
 
@@ -198,7 +168,7 @@ flowchart TB
   subgraph core [Core]
     Either[Either]
     EntityBase[Entity base]
-    Errors[UseCaseError etc]
+    Errors[Erros de aplicação]
   end
 
   HttpHandlers --> UseCases
@@ -243,26 +213,26 @@ As rotas `/auth/*` e `/sign-up/*` são tratadas diretamente pelo better-auth. As
 
 ```
 src/api/
-├── index.ts              # OpenAPIHono, CORS, auth handler, session middleware, rotas
+├── index.ts              # App Hono, CORS, auth handler, session middleware, registro de rotas
 ├── core/
 │   ├── either.ts         # Left / Right para erros tipados
 │   ├── entities/         # Entity, UniqueEntityID
-│   ├── errors/           # NotAllowedError, ResourceNotFoundError, UseCaseError
-│   └── types/            # Optional etc.
+│   ├── errors/           # Erros de aplicação
+│   └── types/            # Tipos utilitários
 ├── domain/
-│   ├── enterprise/entities/   # User
+│   ├── enterprise/entities/   # Entidades de negócio
 │   └── application/
-│       ├── repositories/      # UserRepository (interface)
-│       └── use-case/          # ChangeDisplayNameUseCase
+│       ├── repositories/      # Interfaces de repositório
+│       └── use-case/          # Use cases
 └── infra/
-    ├── auth/             # better-auth config + adapter Drizzle
+    ├── auth/             # Config better-auth + adapter Drizzle
     ├── middlewares/      # requireAuth
-    ├── http/             # Handlers por recurso (change-display-name.ts)
+    ├── http/             # Handlers por recurso (rotas OpenAPI)
     └── database/drizzle/
-        ├── schema.ts     # Tabelas (users, sessions, finance_*)
-        ├── repositories/ # DrizzleUserRepository, categories, expenses, investments
-        ├── mappers/      # UserMapper (toDomain / toDrizzle)
+        ├── schema.ts     # Definição das tabelas
+        ├── repositories/ # Implementações dos repositórios
+        ├── mappers/      # Conversão persistência ↔ domínio
         └── migrations/
 ```
 
-Os **handlers** em `infra/http/` registram rotas OpenAPI, aplicam `requireAuth` quando necessário, instanciam o use case com o repositório Drizzle e mapeiam o retorno `Either` para status e JSON.
+Os handlers em `infra/http/` registram rotas OpenAPI, aplicam `requireAuth` quando necessário, instanciam o use case com o repositório e mapeiam o retorno `Either` para status HTTP e JSON.
