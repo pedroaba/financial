@@ -142,7 +142,7 @@ export function SignUpForm() {
         <div className="flex justify-end">
           <Button
             type="submit"
-            className="w-full text-foreground"
+            className="w-full"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && (
@@ -158,7 +158,7 @@ export function SignUpForm() {
           <span className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">or</span>
+          <span className="bg-card px-2 text-muted-foreground">or</span>
         </div>
       </div>
 

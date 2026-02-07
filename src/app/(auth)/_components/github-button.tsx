@@ -28,7 +28,7 @@ export function GitHubButton({
       type="button"
       variant="outline"
       onClick={handleGithubAction}
-      className={cn('w-full', className)}
+      className={cn('w-full h-9', className)}
       disabled={isGithubLoading || disabled}
       {...props}
     >
