@@ -127,7 +127,7 @@ export default function BucketDetailPage() {
   if (loading && !bucket) {
     return (
       <div className="p-6">
-        <p className="text-zinc-400">Loading…</p>
+        <p className="text-muted-foreground">Loading…</p>
       </div>
     )
   }
@@ -143,7 +143,7 @@ export default function BucketDetailPage() {
         </div>
         <Link
           href="/investments"
-          className="mt-4 inline-block text-sm text-zinc-400 hover:text-zinc-200"
+          className="mt-4 inline-block text-sm text-muted-foreground hover:text-foreground"
         >
           ← Back to investments
         </Link>
@@ -163,32 +163,32 @@ export default function BucketDetailPage() {
     <div className="p-6">
       <Link
         href="/investments"
-        className="text-sm text-zinc-400 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+        className="text-sm text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
       >
         ← Back to investments
       </Link>
 
       <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-100">
+          <h1 className="text-2xl font-semibold text-foreground">
             {bucket?.name}
           </h1>
           {bucket?.institution && (
-            <p className="text-sm text-zinc-500">{bucket.institution}</p>
+            <p className="text-sm text-muted-foreground">{bucket.institution}</p>
           )}
         </div>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => openAdd('deposit')}
-            className="rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+            className="rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-background"
           >
             Deposit
           </button>
           <button
             type="button"
             onClick={() => openAdd('withdraw')}
-            className="rounded-md bg-zinc-700 px-3 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+            className="rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
           >
             Withdraw
           </button>
@@ -204,9 +204,9 @@ export default function BucketDetailPage() {
         </div>
       )}
 
-      <div className="mt-6 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-        <p className="text-sm font-medium text-zinc-400">Balance</p>
-        <p className="mt-1 text-3xl font-semibold text-zinc-100">
+      <div className="mt-6 rounded-lg border border-border bg-card/50 p-4">
+        <p className="text-sm font-medium text-muted-foreground">Balance</p>
+        <p className="mt-1 text-3xl font-semibold text-foreground">
           {balanceNum.toLocaleString('pt-BR', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
@@ -214,17 +214,17 @@ export default function BucketDetailPage() {
         </p>
         {progress != null && goalAmount != null && (
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-zinc-500">
+            <div className="flex justify-between text-sm text-muted-foreground">
               <span>Progress to goal</span>
               <span>{progress.toFixed(0)}%</span>
             </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-zinc-100 transition-all"
+                className="h-full rounded-full bg-primary transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               Goal:{' '}
               {goalAmount.toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
@@ -235,29 +235,29 @@ export default function BucketDetailPage() {
         )}
       </div>
 
-      <h2 className="mt-8 text-lg font-medium text-zinc-200">Transactions</h2>
+      <h2 className="mt-8 text-lg font-medium text-foreground">Transactions</h2>
       {transactions.length === 0 ? (
-        <p className="mt-2 text-zinc-500">No transactions yet.</p>
+        <p className="mt-2 text-muted-foreground">No transactions yet.</p>
       ) : (
-        <div className="mt-4 overflow-x-auto rounded-lg border border-zinc-800">
-          <table className="w-full text-left text-sm text-zinc-300">
-            <thead className="border-b border-zinc-800 bg-zinc-900/50">
+        <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+          <table className="w-full text-left text-sm text-foreground">
+            <thead className="border-b border-border bg-card/50">
               <tr>
-                <th className="px-4 py-3 font-medium text-zinc-200">Date</th>
-                <th className="px-4 py-3 font-medium text-zinc-200">Type</th>
-                <th className="px-4 py-3 font-medium text-zinc-200 text-right">
+                <th className="px-4 py-3 font-medium text-foreground">Date</th>
+                <th className="px-4 py-3 font-medium text-foreground">Type</th>
+                <th className="px-4 py-3 font-medium text-foreground text-right">
                   Amount
                 </th>
-                <th className="px-4 py-3 font-medium text-zinc-200">Notes</th>
+                <th className="px-4 py-3 font-medium text-foreground">Notes</th>
               </tr>
             </thead>
             <tbody>
               {[...transactions].reverse().map((tx) => (
                 <tr
                   key={tx.id}
-                  className="border-b border-zinc-800/50 hover:bg-zinc-800/30"
+                  className="border-b border-border/50 hover:bg-muted/30"
                 >
-                  <td className="px-4 py-3 text-zinc-400">
+                  <td className="px-4 py-3 text-muted-foreground">
                     {new Date(tx.occurredAt).toLocaleString('pt-BR')}
                   </td>
                   <td className="px-4 py-3 capitalize">{tx.type}</td>
@@ -272,7 +272,7 @@ export default function BucketDetailPage() {
                       maximumFractionDigits: 2,
                     })}
                   </td>
-                  <td className="px-4 py-3 text-zinc-500">{tx.notes ?? '—'}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{tx.notes ?? '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -284,18 +284,18 @@ export default function BucketDetailPage() {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
           <Dialog.Content
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-zinc-800 bg-zinc-900 p-6 shadow-lg focus:outline-none"
+            className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-card p-6 shadow-lg focus:outline-none"
             aria-describedby={undefined}
             onPointerDownOutside={(e) => e.preventDefault()}
           >
-            <Dialog.Title className="text-lg font-semibold text-zinc-100">
+            <Dialog.Title className="text-lg font-semibold text-foreground">
               {formType === 'deposit' ? 'Deposit' : 'Withdraw'}
             </Dialog.Title>
             <form onSubmit={handleSubmit} className="mt-4 space-y-4">
               <div>
                 <label
                   htmlFor="tx-amount"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Amount *
                 </label>
@@ -307,14 +307,14 @@ export default function BucketDetailPage() {
                   required
                   value={formAmount}
                   onChange={(e) => setFormAmount(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   disabled={submitting}
                 />
               </div>
               <div>
                 <label
                   htmlFor="tx-occurred"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Date *
                 </label>
@@ -324,14 +324,14 @@ export default function BucketDetailPage() {
                   required
                   value={formOccurredAt}
                   onChange={(e) => setFormOccurredAt(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   disabled={submitting}
                 />
               </div>
               <div>
                 <label
                   htmlFor="tx-notes"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Notes
                 </label>
@@ -340,7 +340,7 @@ export default function BucketDetailPage() {
                   type="text"
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   disabled={submitting}
                 />
               </div>
@@ -348,7 +348,7 @@ export default function BucketDetailPage() {
                 <Dialog.Close asChild>
                   <button
                     type="button"
-                    className="rounded-md px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     Cancel
                   </button>
@@ -356,7 +356,7 @@ export default function BucketDetailPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 disabled:opacity-50"
+                  className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
                 >
                   {submitting
                     ? 'Saving…'

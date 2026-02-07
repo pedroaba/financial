@@ -41,7 +41,7 @@ export function NotificationsSection() {
         />
         <Label
           htmlFor="email-notifications"
-          className="text-sm text-zinc-300 cursor-pointer"
+          className="text-sm text-foreground cursor-pointer"
         >
           Enable email notifications
         </Label>

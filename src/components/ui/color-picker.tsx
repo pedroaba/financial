@@ -368,7 +368,7 @@ const PercentageInput = ({ className, ...props }: PercentageInputProps) => {
         type="text"
         {...(props as any)}
         className={cn(
-          'h-9 w-[3.25rem] rounded-l-none bg-zinc-950 px-2 text-xs shadow-none',
+          'h-9 w-[3.25rem] rounded-l-none bg-background px-2 text-xs shadow-none',
           className,
         )}
       />
@@ -400,7 +400,7 @@ export const ColorPickerFormat = ({
         {...(props as any)}
       >
         <Input
-          className="h-full min-w-0 flex-1 rounded-r-none bg-zinc-950 px-2 text-xs shadow-none"
+          className="h-full min-w-0 flex-1 rounded-r-none bg-background px-2 text-xs shadow-none"
           readOnly
           type="text"
           value={hex}
@@ -454,7 +454,7 @@ export const ColorPickerFormat = ({
         {...(props as any)}
       >
         <Input
-          className="h-full w-full bg-zinc-950 px-2 text-xs shadow-none"
+          className="h-full w-full bg-background px-2 text-xs shadow-none"
           readOnly
           type="text"
           value={`rgba(${rgb.join(', ')}, ${alpha}%)`}
@@ -481,7 +481,7 @@ export const ColorPickerFormat = ({
         {hsl.map((value, index) => (
           <Input
             className={cn(
-              'h-full rounded-r-none bg-zinc-950 px-2 text-xs shadow-none',
+              'h-full rounded-r-none bg-background px-2 text-xs shadow-none',
               index && 'rounded-l-none',
               className,
             )}

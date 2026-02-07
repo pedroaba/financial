@@ -119,7 +119,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <main className="p-6">
-        <h1 className="text-2xl font-semibold text-zinc-100">Dashboard</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
         <div
           className="mt-4 rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-400"
           role="alert"
@@ -133,29 +133,29 @@ export default function DashboardPage() {
   return (
     <main className="p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-zinc-100">Dashboard</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
         <div className="flex gap-2">
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+            className="rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             aria-label="From date"
           />
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+            className="rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             aria-label="To date"
           />
         </div>
       </div>
 
       {loading ? (
-        <p className="mt-6 text-zinc-400">Loading…</p>
+        <p className="mt-6 text-muted-foreground">Loading…</p>
       ) : expenses.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-zinc-800 bg-zinc-900/30 p-8 text-center text-zinc-400">
+        <div className="mt-6 rounded-lg border border-border bg-card/30 p-8 text-center text-muted-foreground">
           <p>No expenses in this period.</p>
           <p className="mt-2 text-sm">
             Add expenses to see totals and charts here.
@@ -164,32 +164,32 @@ export default function DashboardPage() {
       ) : (
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-              <p className="text-sm font-medium text-zinc-400">Total spent</p>
-              <p className="mt-1 text-2xl font-semibold text-zinc-100">
+            <div className="rounded-lg border border-border bg-card/50 p-4">
+              <p className="text-sm font-medium text-muted-foreground">Total spent</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {totalSpent.toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
               </p>
             </div>
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-              <p className="text-sm font-medium text-zinc-400">Transactions</p>
-              <p className="mt-1 text-2xl font-semibold text-zinc-100">
+            <div className="rounded-lg border border-border bg-card/50 p-4">
+              <p className="text-sm font-medium text-muted-foreground">Transactions</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {expenses.length}
               </p>
             </div>
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-              <p className="text-sm font-medium text-zinc-400">Top category</p>
-              <p className="mt-1 text-2xl font-semibold text-zinc-100">
+            <div className="rounded-lg border border-border bg-card/50 p-4">
+              <p className="text-sm font-medium text-muted-foreground">Top category</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {categoryData[0]?.name ?? '—'}
               </p>
             </div>
           </div>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-              <h2 className="text-lg font-medium text-zinc-200">
+            <div className="rounded-lg border border-border bg-card/50 p-4">
+              <h2 className="text-lg font-medium text-foreground">
                 Spending over time
               </h2>
               <div className="mt-4 h-64">
@@ -237,11 +237,11 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-              <h2 className="text-lg font-medium text-zinc-200">By category</h2>
+            <div className="rounded-lg border border-border bg-card/50 p-4">
+              <h2 className="text-lg font-medium text-foreground">By category</h2>
               <div className="mt-4 h-64">
                 {categoryData.length === 0 ? (
-                  <p className="flex h-full items-center justify-center text-zinc-500">
+                  <p className="flex h-full items-center justify-center text-muted-foreground">
                     No categories
                   </p>
                 ) : (

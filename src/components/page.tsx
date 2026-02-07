@@ -25,7 +25,7 @@ interface PageHeaderTitleProps extends ComponentProps<'h1'> {}
 function PageHeaderTitle({ className, ...props }: PageHeaderTitleProps) {
   return (
     <h1
-      className={cn('text-xl font-semibold text-zinc-100', className)}
+      className={cn('text-xl font-semibold text-foreground', className)}
       {...props}
     />
   )
@@ -38,7 +38,7 @@ function PageHeaderDescription({
   ...props
 }: PageHeaderDescriptionProps) {
   return (
-    <p className={cn('mt-1 text-sm text-zinc-400', className)} {...props} />
+    <p className={cn('mt-1 text-sm text-muted-foreground', className)} {...props} />
   )
 }
 

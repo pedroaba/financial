@@ -19,7 +19,7 @@ function ToolbarTitle({ className, ...props }: ToolbarTitleProps) {
 interface ToolbarDescriptionProps extends ComponentProps<'p'> {}
 
 function ToolbarDescription({ className, ...props }: ToolbarDescriptionProps) {
-  return <p className={cn('text-sm text-zinc-400', className)} {...props} />
+  return <p className={cn('text-sm text-muted-foreground', className)} {...props} />
 }
 
 interface ToolbarContentProps extends ComponentProps<'div'> {}
@@ -36,7 +36,7 @@ function ToolbarContent({ className, ...props }: ToolbarContentProps) {
 interface ToolbarActionProps extends ComponentProps<typeof Button> {}
 
 function ToolbarAction({ className, ...props }: ToolbarActionProps) {
-  return <Button className={cn('text-zinc-900', className)} {...props} />
+  return <Button className={className} {...props} />
 }
 
 export const Toolbar = {

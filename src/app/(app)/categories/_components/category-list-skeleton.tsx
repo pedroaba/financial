@@ -18,21 +18,21 @@ export function CategoryListSkeleton({
   rows = DEFAULT_TABLE_SKELETON_ROWS,
 }: CategoryListSkeletonProps) {
   return (
-    <div className="overflow-hidden mt-4 rounded border border-zinc-800 bg-zinc-900/50">
+    <div className="overflow-hidden mt-4 rounded border border-border bg-card/50">
       <Table>
-        <TableHeader className="bg-zinc-900/80">
-          <TableRow className="border-zinc-800 hover:bg-transparent">
-            <TableHead className="min-w-28 text-zinc-400">Color</TableHead>
-            <TableHead className="text-zinc-400">Name</TableHead>
-            <TableHead className="text-zinc-400">Kind</TableHead>
-            <TableHead className="w-24 text-right text-zinc-400">
+        <TableHeader className="bg-card/80">
+          <TableRow className="border-border hover:bg-transparent">
+            <TableHead className="min-w-28 text-muted-foreground">Color</TableHead>
+            <TableHead className="text-muted-foreground">Name</TableHead>
+            <TableHead className="text-muted-foreground">Kind</TableHead>
+            <TableHead className="w-24 text-right text-muted-foreground">
               Actions
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {Array.from({ length: rows }).map((_, i) => (
-            <TableRow key={i} className="border-zinc-800 hover:bg-transparent">
+            <TableRow key={i} className="border-border hover:bg-transparent">
               <TableCell className="py-3">
                 <Skeleton className="h-6 w-20 rounded-md" />
               </TableCell>

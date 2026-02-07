@@ -104,16 +104,16 @@ export function ConnectedAccountsSection({
                 key={account.id}
                 className={cn(
                   'flex items-center justify-between rounded-lg border px-4 py-3',
-                  'border-zinc-800 bg-zinc-900/50',
+                  'border-border bg-card/50',
                 )}
               >
                 <div className="flex items-center gap-3">
                   {Icon ? (
-                    <Icon className="size-5 text-zinc-400" />
+                    <Icon className="size-5 text-muted-foreground" />
                   ) : (
-                    <span className="size-5 rounded-full bg-zinc-600" />
+                    <span className="size-5 rounded-full bg-muted" />
                   )}
-                  <span className="font-medium text-zinc-200">{label}</span>
+                  <span className="font-medium text-foreground">{label}</span>
                 </div>
                 <Button
                   type="button"

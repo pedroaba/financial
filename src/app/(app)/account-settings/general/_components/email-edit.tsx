@@ -22,7 +22,7 @@ export async function EmailEdit({ email }: EmailEditProps) {
           disabled
           placeholder="Your email address"
           type="email"
-          className="bg-zinc-900/50 text-zinc-400 max-w-md mt-4"
+          className="bg-card/50 text-muted-foreground max-w-md mt-4"
         />
       </SettingsCard.Content>
 

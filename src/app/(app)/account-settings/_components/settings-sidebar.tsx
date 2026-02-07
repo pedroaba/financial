@@ -26,7 +26,7 @@ export function SettingsSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-zinc-800 bg-zinc-950">
+    <aside className="flex w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <ScrollArea className="flex-1">
         <nav className="flex flex-col gap-0.5 p-2">
           {navItems.map((item) => {
@@ -39,8 +39,8 @@ export function SettingsSidebar() {
                 className={cn(
                   'flex items-center gap-2 px-2 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? 'border-b-2 border-zinc-100 text-zinc-100'
-                    : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 border-b-2 border-transparent',
+                    ? 'border-b-2 border-sidebar-primary text-sidebar-foreground'
+                    : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground border-b-2 border-transparent',
                 )}
               >
                 <Icon className="size-4 shrink-0" />

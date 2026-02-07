@@ -167,11 +167,11 @@ export default function ExpensesPage() {
   return (
     <div className="p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-zinc-100">Expenses</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Expenses</h1>
         <button
           type="button"
           onClick={openCreate}
-          className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+          className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
         >
           Add expense
         </button>
@@ -182,14 +182,14 @@ export default function ExpensesPage() {
           type="date"
           value={dateFrom}
           onChange={(e) => setDateFrom(e.target.value)}
-          className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+          className="rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="From date"
         />
         <input
           type="date"
           value={dateTo}
           onChange={(e) => setDateTo(e.target.value)}
-          className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+          className="rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="To date"
         />
         <input
@@ -197,7 +197,7 @@ export default function ExpensesPage() {
           placeholder="Search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+          className="rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Search expenses"
         />
       </div>
@@ -212,24 +212,24 @@ export default function ExpensesPage() {
       )}
 
       {loading ? (
-        <p className="mt-6 text-zinc-400">Loading…</p>
+        <p className="mt-6 text-muted-foreground">Loading…</p>
       ) : expenses.length === 0 ? (
-        <p className="mt-6 text-zinc-400">
+        <p className="mt-6 text-muted-foreground">
           No expenses yet. Add one to get started.
         </p>
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-lg border border-zinc-800">
-          <table className="w-full text-left text-sm text-zinc-300">
-            <thead className="border-b border-zinc-800 bg-zinc-900/50">
+        <div className="mt-6 overflow-x-auto rounded-lg border border-border">
+          <table className="w-full text-left text-sm text-foreground">
+            <thead className="border-b border-border bg-card/50">
               <tr>
-                <th className="px-4 py-3 font-medium text-zinc-200">Date</th>
-                <th className="px-4 py-3 font-medium text-zinc-200">
+                <th className="px-4 py-3 font-medium text-foreground">Date</th>
+                <th className="px-4 py-3 font-medium text-foreground">
                   Description
                 </th>
-                <th className="px-4 py-3 font-medium text-zinc-200">
+                <th className="px-4 py-3 font-medium text-foreground">
                   Category
                 </th>
-                <th className="px-4 py-3 font-medium text-zinc-200 text-right">
+                <th className="px-4 py-3 font-medium text-foreground text-right">
                   Amount
                 </th>
                 <th className="px-4 py-3 w-24" aria-label="Actions" />
@@ -239,13 +239,13 @@ export default function ExpensesPage() {
               {expenses.map((exp) => (
                 <tr
                   key={exp.id}
-                  className="border-b border-zinc-800/50 hover:bg-zinc-800/30"
+                  className="border-b border-border/50 hover:bg-muted/30"
                 >
-                  <td className="px-4 py-3 text-zinc-400">
+                  <td className="px-4 py-3 text-muted-foreground">
                     {new Date(exp.occurredAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="font-medium text-zinc-100">
+                    <span className="font-medium text-foreground">
                       {exp.description || exp.merchant || '—'}
                     </span>
                   </td>
@@ -259,7 +259,7 @@ export default function ExpensesPage() {
                     />
                     {exp.categoryName ?? 'Uncategorized'}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-zinc-100">
+                  <td className="px-4 py-3 text-right font-medium text-foreground">
                     {Number(exp.amount).toLocaleString('pt-BR', {
                       minimumFractionDigits: 2,
                     })}
@@ -269,7 +269,7 @@ export default function ExpensesPage() {
                       <button
                         type="button"
                         onClick={() => openEdit(exp)}
-                        className="rounded px-2 py-1 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                        className="rounded px-2 py-1 text-muted-foreground hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                       >
                         Edit
                       </button>
@@ -293,18 +293,18 @@ export default function ExpensesPage() {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
           <Dialog.Content
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-zinc-800 bg-zinc-900 p-6 shadow-lg focus:outline-none"
+            className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-card p-6 shadow-lg focus:outline-none"
             aria-describedby={undefined}
             onPointerDownOutside={(e) => e.preventDefault()}
           >
-            <Dialog.Title className="text-lg font-semibold text-zinc-100">
+            <Dialog.Title className="text-lg font-semibold text-foreground">
               {editingId ? 'Edit expense' : 'New expense'}
             </Dialog.Title>
             <form onSubmit={handleSubmit} className="mt-4 space-y-4">
               <div>
                 <label
                   htmlFor="exp-amount"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Amount *
                 </label>
@@ -316,14 +316,14 @@ export default function ExpensesPage() {
                   required
                   value={formAmount}
                   onChange={(e) => setFormAmount(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   disabled={submitting}
                 />
               </div>
               <div>
                 <label
                   htmlFor="exp-occurred"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Date *
                 </label>
@@ -333,14 +333,14 @@ export default function ExpensesPage() {
                   required
                   value={formOccurredAt}
                   onChange={(e) => setFormOccurredAt(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   disabled={submitting}
                 />
               </div>
               <div>
                 <label
                   htmlFor="exp-description"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Description
                 </label>
@@ -349,7 +349,7 @@ export default function ExpensesPage() {
                   type="text"
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   placeholder="What was it for?"
                   disabled={submitting}
                 />
@@ -357,7 +357,7 @@ export default function ExpensesPage() {
               <div>
                 <label
                   htmlFor="exp-category"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Category
                 </label>
@@ -365,7 +365,7 @@ export default function ExpensesPage() {
                   id="exp-category"
                   value={formCategoryId}
                   onChange={(e) => setFormCategoryId(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   disabled={submitting}
                 >
                   <option value="">Uncategorized</option>
@@ -379,7 +379,7 @@ export default function ExpensesPage() {
               <div>
                 <label
                   htmlFor="exp-merchant"
-                  className="block text-sm font-medium text-zinc-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Merchant
                 </label>
@@ -388,7 +388,7 @@ export default function ExpensesPage() {
                   type="text"
                   value={formMerchant}
                   onChange={(e) => setFormMerchant(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                  className="mt-1 block w-full rounded-md border border-input bg-muted px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   placeholder="Store name"
                   disabled={submitting}
                 />
@@ -397,7 +397,7 @@ export default function ExpensesPage() {
                 <Dialog.Close asChild>
                   <button
                     type="button"
-                    className="rounded-md px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     Cancel
                   </button>
@@ -405,7 +405,7 @@ export default function ExpensesPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 disabled:opacity-50"
+                  className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
                 >
                   {submitting ? 'Saving…' : editingId ? 'Save' : 'Create'}
                 </button>

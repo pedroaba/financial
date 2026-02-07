@@ -82,14 +82,14 @@ export function CategoryList() {
   }
 
   return (
-    <div className="overflow-hidden mt-4 rounded border border-zinc-800 bg-zinc-900/50">
+    <div className="overflow-hidden mt-4 rounded border border-border bg-card/50">
       <Table>
-        <TableHeader className="bg-zinc-900/80">
-          <TableRow className="border-zinc-800 hover:bg-transparent">
-            <TableHead className="min-w-28 text-zinc-400">Color</TableHead>
-            <TableHead className="text-zinc-400">Name</TableHead>
-            <TableHead className="text-zinc-400">Kind</TableHead>
-            <TableHead className="w-24 text-right text-zinc-400">
+        <TableHeader className="bg-card/80">
+          <TableRow className="border-border hover:bg-transparent">
+            <TableHead className="min-w-28 text-muted-foreground">Color</TableHead>
+            <TableHead className="text-muted-foreground">Name</TableHead>
+            <TableHead className="text-muted-foreground">Kind</TableHead>
+            <TableHead className="w-24 text-right text-muted-foreground">
               Actions
             </TableHead>
           </TableRow>
@@ -98,7 +98,7 @@ export function CategoryList() {
           {categories.map((category) => (
             <TableRow
               key={category.id}
-              className="border-zinc-800 hover:bg-transparent"
+              className="border-border hover:bg-transparent"
             >
               <TableCell className="py-3">
                 <Badge

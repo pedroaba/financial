@@ -57,7 +57,7 @@ export function GeneralSettings({ user }: GeneralSettingsProps) {
         <Input
           value={user.email ?? ''}
           disabled
-          className="bg-zinc-900/50 text-zinc-400"
+          className="bg-card/50 text-muted-foreground"
         />
       </SettingBlock>
 

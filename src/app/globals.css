@@ -5,7 +5,7 @@
 
 @plugin "tailwind-scrollbar";
 
-/* Application uses Tailwind zinc palette; background = zinc-950 */
+/* Application uses shadcn semantic tokens; values defined in :root and .dark */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

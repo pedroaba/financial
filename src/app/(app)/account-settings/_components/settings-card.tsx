@@ -15,7 +15,7 @@ interface SettingsCardRootProps extends ComponentProps<typeof Card> {}
 
 function SettingsCardRoot({ className, ...props }: SettingsCardRootProps) {
   return (
-    <Card className={cn('rounded bg-zinc-900/60 p-0', className)} {...props} />
+    <Card className={cn('rounded bg-card/60 p-0', className)} {...props} />
   )
 }
 
@@ -57,7 +57,7 @@ function SettingsCardFooter({ className, ...props }: SettingsCardFooterProps) {
   return (
     <CardFooter
       className={cn(
-        'p-4 pt-4! border-t border-zinc-800 bg-zinc-950/50 flex justify-end',
+        'p-4 pt-4! border-t border-border bg-background/50 flex justify-end',
         className,
       )}
       {...props}
@@ -71,7 +71,7 @@ function SettingsCardFooterDescription({
   className,
   ...props
 }: SettingsCardFooterDescriptionProps) {
-  return <span className={cn('text-sm text-zinc-500', className)} {...props} />
+  return <span className={cn('text-sm text-muted-foreground', className)} {...props} />
 }
 
 interface SettingsCardFooterActionProps extends ComponentProps<typeof Button> {}
@@ -91,7 +91,7 @@ function SettingsCardFooterActionText({
 }: SettingsCardFooterActionTextProps) {
   return (
     <span
-      className={cn('text-sm font-medium text-zinc-900', className)}
+      className={cn('text-sm font-medium text-primary-foreground', className)}
       {...props}
     />
   )
@@ -103,7 +103,7 @@ function SettingsCardFooterActionIcon({
   className,
   ...props
 }: SettingsCardFooterActionIconProps) {
-  return <div className={cn('text-zinc-900', className)} {...props} />
+  return <div className={cn('text-foreground', className)} {...props} />
 }
 
 interface SettingsCardFormProps extends ComponentProps<'form'> {}

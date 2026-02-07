@@ -93,7 +93,7 @@ export function SignUpForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-zinc-300">
+              <FormLabel className="text-sm font-medium text-foreground">
                 Name
               </FormLabel>
               <FormControl>
@@ -110,7 +110,7 @@ export function SignUpForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-zinc-300">
+              <FormLabel className="text-sm font-medium text-foreground">
                 Email
               </FormLabel>
               <FormControl>
@@ -127,7 +127,7 @@ export function SignUpForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-zinc-300">
+              <FormLabel className="text-sm font-medium text-foreground">
                 Password
               </FormLabel>
               <FormControl>
@@ -142,7 +142,7 @@ export function SignUpForm() {
         <div className="flex justify-end">
           <Button
             type="submit"
-            className="w-full text-zinc-950"
+            className="w-full text-foreground"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && (
@@ -155,10 +155,10 @@ export function SignUpForm() {
 
       <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-zinc-700" />
+          <span className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-zinc-950 px-2 text-zinc-500">or</span>
+          <span className="bg-background px-2 text-muted-foreground">or</span>
         </div>
       </div>
 
