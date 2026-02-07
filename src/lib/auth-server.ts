@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 
-import { auth } from '@/api/infra/auth'
+import { auth } from '@/lib/better-auth/auth'
 
 /**
  * Get the current session on the server (RSC / Server Actions).

@@ -2,6 +2,7 @@
 
 import type * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
+import type { ComponentProps } from 'react'
 import * as React from 'react'
 import {
   Controller,
@@ -155,9 +156,16 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   )
 }
 
+interface FormRootProps extends ComponentProps<'form'> {}
+
+function FormRoot({ className, ...props }: FormRootProps) {
+  return <form className={cn('space-y-4', className)} {...props} />
+}
+
 export {
   useFormField,
   Form,
+  FormRoot,
   FormItem,
   FormLabel,
   FormControl,

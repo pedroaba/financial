@@ -5,6 +5,7 @@ import { Geist } from 'next/font/google'
 
 import { Toaster } from '@/components/ui/sonner'
 import { ReactQueryProvider } from '@/lib/react-query-provider'
+import { cn } from '@/lib/utils'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -26,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={geist.className}>
+    <html lang="en" className={cn(geist.className, 'dark')}>
       <body>
         <ReactQueryProvider>{children}</ReactQueryProvider>
 

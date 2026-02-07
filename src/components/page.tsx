@@ -51,4 +51,7 @@ export const PageHeader = {
 export const Page = {
   Root: PageRoot,
   Content: PageContent,
+  Header: PageHeaderRoot,
+  Title: PageHeaderTitle,
+  Description: PageHeaderDescription,
 }

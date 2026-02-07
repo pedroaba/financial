@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers'
 
-import { auth } from '@/api/infra/auth'
+import { auth } from '@/lib/better-auth/auth'
 
 export type UserAccount = {
   id: string

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import type { AuthSession } from '@/api/infra/auth'
+import type { AuthSession } from '@/lib/better-auth/auth'
 import { Button } from '@/components/ui/button'
 import {
   Card,

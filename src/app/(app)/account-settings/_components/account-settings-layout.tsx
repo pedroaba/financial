@@ -9,7 +9,7 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-import type { AuthSession } from '@/api/infra/auth'
+import type { AuthSession } from '@/lib/better-auth/auth'
 
 import type { UserAccount } from '../actions'
 
