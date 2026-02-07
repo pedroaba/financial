@@ -17,29 +17,19 @@ export async function POST(request: Request) {
     )
   }
 
-  let body: { display_name: string }
-  try {
-    const raw = await request.json()
-    body = ChangeDisplayNameParamsSchema.parse(raw)
-  } catch {
+  const body = await request.json()
+  const result = ChangeDisplayNameParamsSchema.safeParse(body)
+  if (!result.success) {
     return NextResponse.json(
       { error: 'Validation failed', message: 'Invalid request body' },
       { status: 400 },
     )
   }
 
-  const controller = new UserController()
-  const updated = await controller.updateDisplayName(
-    session.user.id,
-    body.display_name,
-  )
+  const { display_name: displayName } = result.data
 
-  if (!updated) {
-    return NextResponse.json(
-      { error: 'Not found', message: 'User not found' },
-      { status: 404 },
-    )
-  }
+  const controller = new UserController()
+  await controller.updateDisplayName(session.user.id, displayName)
 
   return NextResponse.json(null, { status: 200 })
 }
