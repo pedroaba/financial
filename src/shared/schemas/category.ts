@@ -14,7 +14,7 @@ export const CategorySchema = z.object({
   updatedAt: z.string(),
 })
 
-export type CategoryResponse = z.infer<typeof CategorySchema>
+export type Category = z.infer<typeof CategorySchema>
 
 export const CreateCategoryParamsSchema = z.object({
   name: z
@@ -25,6 +25,7 @@ export const CreateCategoryParamsSchema = z.object({
   icon: z.string().max(50).optional().nullable(),
   kind: CategoryKindSchema.optional().default('expense'),
 })
+
 export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>
 
 export const UpdateCategoryParamsSchema = z.object({

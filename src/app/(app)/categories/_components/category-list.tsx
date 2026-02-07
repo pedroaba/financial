@@ -86,7 +86,9 @@ export function CategoryList() {
       <Table>
         <TableHeader className="bg-card/80">
           <TableRow className="border-border hover:bg-transparent">
-            <TableHead className="min-w-28 text-muted-foreground">Color</TableHead>
+            <TableHead className="min-w-28 text-muted-foreground">
+              Color
+            </TableHead>
             <TableHead className="text-muted-foreground">Name</TableHead>
             <TableHead className="text-muted-foreground">Kind</TableHead>
             <TableHead className="w-24 text-right text-muted-foreground">
@@ -159,6 +161,17 @@ export function CategoryList() {
               </TableCell>
             </TableRow>
           ))}
+
+          {categories.length === 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={4}
+                className="text-center h-40 text-muted-foreground"
+              >
+                No categories found
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
 

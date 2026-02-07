@@ -35,7 +35,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { createCategory } from '@/http/create-category'
+import { updateCategory } from '@/http/update-category'
+import type { Category } from '@/shared/schemas/category'
 import { RandomColor } from '@/utils/get-random-color'
 
 const schema = z.object({
@@ -50,7 +51,7 @@ const schema = z.object({
 type Schema = z.infer<typeof schema>
 
 export interface UpdateCategoryFormRef {
-  open: (category: Schema) => void
+  open: (category: Category) => void
 }
 
 interface UpdateCategoryFormProps {
@@ -67,14 +68,20 @@ export function UpdateCategoryForm({ ref }: UpdateCategoryFormProps) {
     },
   })
 
+  const [categoryId, setCategoryId] = useState<string | null>(null)
+
   const [isDialogOpened, setIsDialogOpened] = useState(false)
   const queryClient = useQueryClient()
 
-  async function handleCreateCategory(values: Schema) {
-    const toastId = toast.loading('Creating category...')
+  async function handleUpdateCategory(values: Schema) {
+    const toastId = toast.loading('Updating category...')
+    if (categoryId === null) {
+      toast.error('Category not found', { id: toastId })
+      return
+    }
 
     try {
-      await createCategory({
+      await updateCategory(categoryId, {
         name: values.name,
         color: values.color,
         kind: values.kind ?? 'expense',
@@ -98,15 +105,29 @@ export function UpdateCategoryForm({ ref }: UpdateCategoryFormProps) {
 
   useImperativeHandle(ref, () => {
     return {
-      open: (category: Schema) => {
+      open: (category: Category) => {
         setIsDialogOpened(true)
+        setCategoryId(category.id)
         form.reset(category)
       },
     }
   }, [form])
 
   return (
-    <Dialog open={isDialogOpened} onOpenChange={setIsDialogOpened}>
+    <Dialog
+      open={isDialogOpened}
+      onOpenChange={(openState) => {
+        setIsDialogOpened(openState)
+        if (!openState) {
+          setCategoryId(null)
+          form.reset({
+            name: '',
+            color: RandomColor.generate(),
+            kind: 'expense',
+          })
+        }
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New category</DialogTitle>
@@ -117,7 +138,7 @@ export function UpdateCategoryForm({ ref }: UpdateCategoryFormProps) {
         </DialogHeader>
 
         <Form {...form}>
-          <FormRoot onSubmit={form.handleSubmit(handleCreateCategory)}>
+          <FormRoot onSubmit={form.handleSubmit(handleUpdateCategory)}>
             <FormField
               control={form.control}
               name="name"
@@ -188,8 +209,8 @@ export function UpdateCategoryForm({ ref }: UpdateCategoryFormProps) {
               <Button disabled={form.formState.isSubmitting} type="submit">
                 {form.formState.isSubmitting && <Spinner />}
                 {form.formState.isSubmitting
-                  ? 'Creating...'
-                  : 'Create Category'}
+                  ? 'Updating...'
+                  : 'Update Category'}
               </Button>
             </div>
           </FormRoot>
