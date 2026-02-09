@@ -1,12 +1,12 @@
 # Financial
 
-Aplicação full-stack de gestão financeira: Next.js no frontend e API REST com Hono no mesmo repositório. Inclui controle de despesas, categorias e investimentos, com autenticação (email/senha e GitHub) e arquitetura de backend em camadas (Clean/DDD).
+Aplicação full-stack de gestão financeira: Next.js no frontend e API REST com Next.js Route Handlers no mesmo repositório. Inclui controle de despesas, categorias e investimentos, com autenticação (email/senha e GitHub) e backend em camadas (controllers, repositories, database).
 
 ---
 
 ## Estrutura do projeto
 
-O código-fonte fica em `src/`. A aplicação divide-se em: **app** (Next.js e UI), **api** (regras de negócio e HTTP), e pastas compartilhadas (**http** client, **lib**, **shared**, **hooks**, **utils**, **components**).
+O código-fonte fica em `src/`. A aplicação divide-se em: **app** (Next.js, UI e Route Handlers em `app/api/`), **controllers**, **repositories**, **database**, **mappers**, e pastas compartilhadas (**http**, **lib**, **shared**, **hooks**, **utils**, **components**).
 
 ```mermaid
 flowchart TB
@@ -15,13 +15,12 @@ flowchart TB
       appRouter[app router]
       appLayout[layout.tsx]
       appGroups["(app) e (auth)"]
-      appApi["api/[[...route]]"]
+      appApiRoutes[app/api - Route Handlers]
     end
-    subgraph api [api - Backend]
-      core[core]
-      domain[domain]
-      infra[infra]
-    end
+    controllers[controllers]
+    repositories[repositories]
+    database[database]
+    mappers[mappers]
     components[components]
     httpClient[http]
     lib[lib]
@@ -32,77 +31,90 @@ flowchart TB
   app --> components
   app --> httpClient
   app --> lib
-  appApi --> api
-  api --> shared
+  appApiRoutes --> controllers
+  appApiRoutes --> lib
+  controllers --> repositories
+  repositories --> database
+  repositories --> mappers
+  controllers --> shared
+  repositories --> shared
 ```
 
 ### Árvore de pastas (resumida)
 
 ```
 src/
-├── api/                    # Backend: domain, core, infra
-│   ├── core/               # Either, Entity, erros, tipos base
-│   ├── domain/             # Entidades, use cases, interfaces de repositório
-│   ├── infra/              # HTTP (Hono), DB (Drizzle), auth, middlewares
-│   └── index.ts            # App Hono + rotas + middlewares
 ├── app/                    # Next.js App Router
-│   ├── (app)/              # Rotas autenticadas
+│   ├── (app)/              # Rotas autenticadas (dashboard, transactions, categories, etc.)
 │   ├── (auth)/             # Login e signup
-│   ├── api/[[...route]]/   # Proxy para a API Hono
+│   ├── api/                # Next.js Route Handlers por recurso
+│   │   ├── account/        # change-display-name
+│   │   ├── auth/[...all]/  # better-auth handler
+│   │   ├── buckets/
+│   │   ├── categories/     # e categories/[id]
+│   │   ├── me/
+│   │   └── transactions/   # e transactions/[id]
 │   ├── layout.tsx
 │   └── globals.css
+├── controllers/            # Controllers (recebem repositório; list, create, update, delete)
+├── repositories/           # Implementações com Drizzle (bucket, category, transaction, user)
+├── database/drizzle/       # Schema Drizzle, migrations, cliente db
+├── mappers/                # Conversão persistência ↔ domínio
 ├── components/             # Componentes reutilizáveis e UI (shadcn)
 │   ├── ui/                 # Primitivos de UI
 │   └── ...                 # Layout e componentes compartilhados
-├── http/                   # Cliente HTTP: funções que chamam a API (fetch)
-├── lib/                    # Auth client/server, React Query, utils
-├── shared/                 # Schemas Zod compartilhados (front + API)
+├── http/                   # Funções que chamam a API (usam cliente em lib/api.ts)
+├── lib/                    # api.ts (ky), auth client/server, React Query, better-auth, utils
+├── shared/                 # Schemas Zod e erros (front + API)
 ├── hooks/
 ├── utils/
 ├── api-env.ts              # Variáveis de ambiente da API
 └── env.ts                  # Variáveis de ambiente do frontend
 ```
 
-- **`api/`**: contém toda a lógica de backend (domain, core, infra). O ponto de entrada é `api/index.ts`, que é montado em `app/api/[[...route]]/route.ts`, então todas as requisições a `/api/*` são tratadas pelo Hono.
-- **`app/`**: rotas, layouts e páginas do Next.js. Route groups `(app)` e `(auth)` não alteram a URL; apenas organizam layout e proteção (ex.: layout de `(app)` exige sessão).
+- **`app/api/`**: cada recurso tem seu `route.ts` (GET, POST, PUT, DELETE). São Next.js Route Handlers que obtêm sessão, validam com Zod, instanciam Controller + Repository e devolvem `NextResponse.json`.
+- **`app/`**: rotas, layouts e páginas do Next.js. Route groups `(app)` e `(auth)` não alteram a URL; o layout de `(app)` exige sessão e redireciona para login se não autenticado.
+- **`controllers/`**: orquestram a lógica; recebem o repositório no construtor e expõem métodos como `list`, `create`, `update`, `delete`.
+- **`repositories/`**: implementações com Drizzle; usam **mappers** para converter linhas do banco no formato de domínio.
+- **`database/drizzle/`**: definição das tabelas, migrations e export do cliente `db` ([drizzle.config.ts](drizzle.config.ts) aponta para este path).
 - **`components/`**: componentes globais (shell, sidebar, page) e `ui/` com os primitivos do shadcn.
-- **`http/`**: funções que chamam a API (uma por ação), com `fetch` e `credentials: 'include'`.
-- **`shared/schemas/`**: schemas Zod usados tanto na validação da API quanto no frontend (tipos e contratos únicos).
+- **`http/`**: funções que chamam a API (uma por ação), usando o cliente **ky** em [src/lib/api.ts](src/lib/api.ts) (`credentials: 'include'`).
+- **`shared/schemas/`**: schemas Zod usados na validação da API e no frontend (tipos e contratos únicos).
 
 ---
 
 ## Geral
 
 - **Projeto**: monólito full-stack (front + API) para controle financeiro (despesas, categorias, investimentos).
-- **Runtime e pacotes**: [Bun](https://bun.sh) (lockfile `bun.lock`), módulos ESM (`"type": "module"`).
+- **Runtime e pacotes**: [pnpm](https://pnpm.io) (lockfile `pnpm-lock.yaml`), módulos ESM (`"type": "module"`).
 - **Linguagem**: TypeScript em modo strict, target ES2022; path alias `@/*` → `./src/*` ([tsconfig.json](tsconfig.json)).
 - **Qualidade de código**:
   - **ESLint**: `eslint-config-next` (core-web-vitals + TypeScript), Prettier e `eslint-plugin-simple-import-sort` (ordem de imports como erro) — [eslint.config.mjs](eslint.config.mjs).
   - **Prettier**: printWidth 80, tabWidth 2, singleQuote, trailingComma all, arrowParens always, semi false.
-- **Testes**: [Vitest](https://vitest.dev) (`npm run test` / `npm run test:watch`); testes em `*.test.ts`.
+- **Testes**: [Vitest](https://vitest.dev) (`pnpm run test` / `pnpm run test:watch`); testes em `*.test.ts`.
 - **Banco e ambiente**: PostgreSQL 17 via [docker-compose.yml](docker-compose.yml); variáveis em [src/api-env.ts](src/api-env.ts) (API) e [src/env.ts](src/env.ts) (frontend).
-- **Scripts**: `dev`, `build`, `start`, `lint`, `test`, `db:generate`, `db:migrate`, `db:push`, `db:studio`, `db:seed`.
+- **Scripts**: `dev`, `build`, `start`, `lint`, `test`, `db:generate`, `db:migrate`, `db:push`, `db:studio`. O script `db:seed` está definido no `package.json` mas aponta para um arquivo que não existe; criar um seed em `src/database/` (ou outro path) e ajustar o script quando necessário.
 
 ### Como rodar
 
-1. Instalar dependências: `bun install` ou `npm install`.
-2. Configurar `.env` com `DATABASE_URL`, `BETTER_AUTH_*`, `NEXT_PUBLIC_API_URL` etc. (ver `src/api-env.ts` e `src/env.ts`).
+1. Instalar dependências: `pnpm install` (ou `npm install`).
+2. Configurar `.env` com `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `NEXT_PUBLIC_API_URL` (ver [src/api-env.ts](src/api-env.ts) e [src/env.ts](src/env.ts)).
 3. Subir o Postgres: `docker compose up -d`.
-4. Aplicar schema: `bun run db:push` ou `bun run db:migrate`.
-5. Iniciar o app: `bun run dev` ou `npm run dev`.
+4. Aplicar schema: `pnpm run db:push` ou `pnpm run db:migrate`.
+5. Iniciar o app: `pnpm run dev` (ou `npm run dev`).
 
 ---
 
 ## Frontend
 
 - **Framework**: [Next.js](https://nextjs.org) 16 com App Router e [React](https://react.dev) 19; [React Compiler](https://react.dev/learn/react-compiler) ativado em [next.config.ts](next.config.ts).
-- **Rotas**: Route groups `(app)` (área autenticada) e `(auth)` (login/signup). O layout de `(app)` valida sessão no servidor e redireciona para login se não autenticado. Listagem completa de rotas da API em **Scalar** (`/api/docs`).
+- **Rotas**: Route groups `(app)` (área autenticada) e `(auth)` (login/signup). O layout de `(app)` valida sessão no servidor e redireciona para login se não autenticado. As rotas da API estão listadas na seção Backend.
 - **UI e estilo**:
   - [shadcn/ui](https://ui.shadcn.com) (estilo **new-york**, base **zinc**, CSS variables, RSC + TSX) — [components.json](components.json); ícones [Lucide](https://lucide.dev).
   - Componentes em `src/components/ui/` (Radix + Tailwind); layout e componentes compartilhados em `src/components/`.
   - [Tailwind CSS](https://tailwindcss.com) v4 em [src/app/globals.css](src/app/globals.css): `@import "tailwindcss"`, `tw-animate-css`, `tailwind-scrollbar`, tema com variáveis (radius, cores semânticas).
 - **Formulários**: [React Hook Form](https://react-hook-form.com) + `@hookform/resolvers` (Zod) + componentes Form do shadcn; validação com Zod no cliente.
-- **Dados e chamadas**: [TanStack React Query](https://tanstack.com/query/latest) em [src/lib/react-query-provider.tsx](src/lib/react-query-provider.tsx); funções em `src/http/*` usam `fetch` com `credentials: 'include'` para a API em `NEXT_PUBLIC_API_URL`.
+- **Dados e chamadas**: [TanStack React Query](https://tanstack.com/query/latest) em [src/lib/react-query-provider.tsx](src/lib/react-query-provider.tsx); o cliente HTTP é [ky](https://github.com/sindresorhus/ky) em [src/lib/api.ts](src/lib/api.ts) (`prefixUrl` + `credentials: 'include'`). As funções em `src/http/*` usam esse cliente para chamar a API em `NEXT_PUBLIC_API_URL`.
 - **Autenticação**: [better-auth](https://www.better-auth.com) no cliente (`authClient.useSession()` etc.) em [src/lib/auth-client.ts](src/lib/auth-client.ts).
 - **Padrões**:
   - **Composition (Compound Components)**: componentes compostos são exportados como um único objeto com subcomponentes nomeados (ex.: `Card.Root`, `Card.Content`, `Card.Header`). Cada subcomponente estende `ComponentProps` do elemento base; o uso no JSX fica declarativo e flexível. Ver `src/components/page.tsx` e componentes em `_components` das rotas.
@@ -117,122 +129,120 @@ src/
 sequenceDiagram
   participant Page as Page/Component
   participant Http as src/http
-  participant API as /api (Hono)
-  participant UseCase as Use Case
+  participant API as /api (Next.js Route Handlers)
+  participant Controller as Controller
   participant Repo as Repository
 
   Page->>Http: action(params)
-  Http->>API: POST /api/... (credentials: include)
-  API->>API: Valida body (Zod/OpenAPI)
-  API->>API: requireAuth
-  API->>UseCase: new UseCase(repo).execute(...)
-  UseCase->>Repo: findById / update / etc.
-  Repo->>UseCase: entidade ou null
-  UseCase-->>API: Either Left/Right
-  API-->>Http: 200 ou 4xx + JSON
+  Http->>API: POST /api/... (ky, credentials: include)
+  API->>API: auth.api.getSession + Valida body (Zod)
+  API->>Controller: new Controller(repo).create(...)
+  Controller->>Repo: create / update / etc.
+  Repo->>Controller: resultado
+  Controller-->>API: retorno
+  API-->>Http: 200 ou 4xx/5xx + JSON
   Http-->>Page: resultado ou throw
 ```
 
-A página chama uma função de `src/http/*`, que faz `fetch` para `/api/*`. A API valida o body, aplica auth, executa o use case (com repositório injetado) e devolve status + JSON.
+A página chama uma função de `src/http/*`, que usa o cliente ky em `lib/api.ts` para enviar requisições a `/api/*`. O Route Handler obtém a sessão, valida o body com Zod, instancia Controller e Repository, executa a ação e devolve status + JSON.
 
 ---
 
 ## Backend
 
-- **API**: [Hono](https://hono.dev) com [OpenAPIHono](https://hono.dev/docs/openapi) em [src/api/index.ts](src/api/index.ts), exposta via Next.js em [src/app/api/[[...route]]/route.ts](src/app/api/[[...route]]/route.ts) (GET, POST, PUT, DELETE, PATCH, etc.). Base path: `/api`.
-- **Autenticação**: better-auth em [src/api/infra/auth/index.ts](src/api/infra/auth/index.ts) com adapter Drizzle; email/senha e GitHub; rotas `/auth/*` e `/sign-up/*` delegadas ao handler do auth; middleware de sessão preenche `user` e `session` no contexto; rotas protegidas usam [requireAuth](src/api/infra/middlewares/auth.ts).
-- **Arquitetura (Clean/DDD)**:
-  - **Domain** (`src/api/domain/`): entidades em `enterprise/entities`; interfaces de repositório e use cases em `application/` (repositories, use-case).
-  - **Core** (`src/api/core/`): tipo Either (Left/Right) para erros tipados; base Entity e UniqueEntityID; erros de aplicação (UseCaseError, NotAllowedError, ResourceNotFoundError).
-  - **Infra** (`src/api/infra/`): HTTP (handlers Hono + rotas OpenAPI), DB (Drizzle), auth e middlewares; implementações de repositório e mappers entre persistência e domínio.
-- **Fluxo típico**: Handler valida body com Zod/OpenAPI → instancia use case com repositório Drizzle → `execute()` retorna `Either`; em `Left` mapeia para status HTTP (403, 404, etc.) e JSON padronizado; em `Right` retorna 200 com corpo definido.
-- **Validação e contratos**: Schemas Zod em `src/shared/schemas/`; `@hono/zod-openapi` para request/response e geração OpenAPI.
-- **Documentação**: [Scalar](https://github.com/scalar/scalar) em `/api/docs`; spec OpenAPI em `/api/openapi.json`.
-- **Banco**: PostgreSQL; [Drizzle ORM](https://orm.drizzle.team) com schema em `src/api/infra/database/drizzle/`; migrations com drizzle-kit; [drizzle.config.ts](drizzle.config.ts) com dialect `postgresql` e `casing: 'snake_case'`. Tabelas de auth (Better Auth) e do domínio financeiro, multi-tenant por `userId`.
+- **API**: [Next.js Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) em `src/app/api/`. Cada recurso tem seu próprio `route.ts` (GET, POST, PUT, DELETE). Base path: `/api`. Rotas atuais:
+  - `account/general/change-display-name` — PUT
+  - `auth/[...all]` — GET/POST (better-auth)
+  - `buckets` — GET
+  - `categories` — GET, POST; `categories/[id]` — PUT, DELETE
+  - `me` — GET
+  - `transactions` — GET, POST; `transactions/[id]` — PUT, DELETE
+- **Autenticação**: better-auth em [src/lib/better-auth/auth.ts](src/lib/better-auth/auth.ts) com adapter Drizzle; email/senha e GitHub. O handler Next.js fica em [src/app/api/auth/[...all]/route.ts](src/app/api/auth/[...all]/route.ts) via `toNextJsHandler(auth)`. Rotas protegidas obtêm a sessão com `auth.api.getSession({ headers })` no início do handler e retornam 401 se não autenticado.
+- **Fluxo típico**: Route Handler chama `auth.api.getSession` → valida body/params com Zod (`safeParse`) → instancia Repository e Controller → chama método do controller → em caso de sucesso retorna `NextResponse.json` (200/201/204); em caso de erro (try/catch) retorna 400/401/500 com JSON padronizado.
+- **Validação**: Schemas Zod em [src/shared/schemas/](src/shared/schemas/) (category, transaction, bucket, change-display-name, errors).
+- **Banco**: PostgreSQL; [Drizzle ORM](https://orm.drizzle.team) com schema em [src/database/drizzle/schema.ts](src/database/drizzle/schema.ts); migrations em `src/database/drizzle/migrations/`; [drizzle.config.ts](drizzle.config.ts) com dialect `postgresql` e `casing: 'snake_case'`. Tabelas de auth (Better Auth) e do domínio financeiro, multi-tenant por `userId`.
 
-### Camadas da API (Clean Architecture)
+### Camadas do backend
 
 ```mermaid
 flowchart TB
-  subgraph infra [Infra]
-    HttpHandlers[HTTP Handlers - Hono]
-    DrizzleRepos[Drizzle Repositories]
+  subgraph routes [Route Handlers]
+    AppApi[app/api - route.ts por recurso]
+  end
+  subgraph lib [Lib]
+    Auth[better-auth]
+    ApiClient[api.ts - ky]
+  end
+  subgraph backend [Backend]
+    Controllers[Controllers]
+    Repos[Repositories]
     Mappers[Mappers]
-    Auth[Auth - better-auth]
+    DbSchema[Database - Drizzle schema]
   end
-  subgraph domain [Domain]
-    Entities[Entities]
-    UseCases[Use Cases]
-    RepoInterfaces[Repository Interfaces]
-  end
-  subgraph core [Core]
-    Either[Either]
-    EntityBase[Entity base]
-    Errors[Erros de aplicação]
+  subgraph shared [Shared]
+    Schemas[Schemas Zod]
+    Errors[Erros]
   end
 
-  HttpHandlers --> UseCases
-  HttpHandlers --> Auth
-  UseCases --> RepoInterfaces
-  UseCases --> Either
-  UseCases --> Entities
-  Entities --> EntityBase
-  RepoInterfaces --> DrizzleRepos
-  DrizzleRepos --> Mappers
-  Mappers --> Entities
+  AppApi --> Auth
+  AppApi --> Controllers
+  Controllers --> Repos
+  Repos --> DbSchema
+  Repos --> Mappers
+  AppApi --> Schemas
+  Controllers --> Schemas
 ```
 
-- **Infra**: recebe a requisição (Hono), valida com Zod, chama o use case injetando um repositório concreto (Drizzle). Repositórios e mappers traduzem entre tabelas e entidades de domínio.
-- **Domain**: entidades de negócio e use cases que dependem apenas de interfaces de repositório (não de Drizzle ou HTTP).
-- **Core**: tipos e estruturas compartilhadas (Either, Entity, erros); sem dependência de framework ou DB.
+- **Route Handlers**: recebem a requisição, validam sessão com better-auth, validam body/params com Zod, instanciam Controller e Repository e convertem o retorno em `NextResponse`.
+- **Controllers**: orquestram a lógica; recebem o repositório no construtor e expõem métodos como `list`, `create`, `update`, `delete`.
+- **Repositories**: implementações com Drizzle; usam **mappers** para converter linhas do banco no formato esperado pelo domínio.
+- **Shared**: schemas Zod e erros de aplicação (UseCaseError, ResourceNotFoundError, etc.); as rotas atuais usam try/catch e respostas genéricas, mas os erros em `src/shared/errors/` e o tipo Either em `src/lib/safe-return/either.ts` existem para uso futuro.
 
 ### Fluxo de uma requisição protegida
 
 ```mermaid
 flowchart LR
-  A[Request] --> B[CORS]
-  B --> C{Auth route?}
-  C -->|Sim| D[better-auth handler]
-  C -->|Nao| E[Session middleware]
-  E --> F[user/session no context]
-  F --> G{Rota protegida?}
-  G -->|Sim| H[requireAuth]
-  G -->|Nao| I[Handler]
-  H --> I
-  I --> J[Validacao Zod]
-  J --> K[Use case.execute]
-  K --> L[Either]
-  L --> M{Left ou Right?}
-  M -->|Left| N[4xx + JSON]
-  M -->|Right| O[200 + body]
+  A[Request] --> B{Auth route?}
+  B -->|Sim| C[better-auth handler]
+  B -->|Nao| D[Route Handler]
+  D --> E[auth.api.getSession]
+  E --> F{Session OK?}
+  F -->|Nao| G[401 Unauthorized]
+  F -->|Sim| H[Validacao Zod]
+  H --> I[Controller + Repository]
+  I --> J[NextResponse 200/201/204]
+  I --> K[try/catch 400/500]
 ```
 
-As rotas `/auth/*` e `/sign-up/*` são tratadas diretamente pelo better-auth. As demais passam pelo middleware de sessão; as protegidas exigem `requireAuth`. O handler valida o body, executa o use case e converte o `Either` em resposta HTTP.
+As rotas `/api/auth/*` são tratadas pelo better-auth via `toNextJsHandler(auth)`. As demais são Route Handlers que chamam `auth.api.getSession` no início; se não houver sessão, retornam 401. Em seguida validam body/params com Zod, instanciam Controller e Repository, executam a ação e retornam o status e JSON apropriados.
 
-### Estrutura da pasta `api/`
+### Estrutura das pastas de backend
 
 ```
-src/api/
-├── index.ts              # App Hono, CORS, auth handler, session middleware, registro de rotas
-├── core/
-│   ├── either.ts         # Left / Right para erros tipados
-│   ├── entities/         # Entity, UniqueEntityID
-│   ├── errors/           # Erros de aplicação
-│   └── types/            # Tipos utilitários
-├── domain/
-│   ├── enterprise/entities/   # Entidades de negócio
-│   └── application/
-│       ├── repositories/      # Interfaces de repositório
-│       └── use-case/          # Use cases
-└── infra/
-    ├── auth/             # Config better-auth + adapter Drizzle
-    ├── middlewares/      # requireAuth
-    ├── http/             # Handlers por recurso (rotas OpenAPI)
-    └── database/drizzle/
-        ├── schema.ts     # Definição das tabelas
-        ├── repositories/ # Implementações dos repositórios
-        ├── mappers/      # Conversão persistência ↔ domínio
-        └── migrations/
+src/
+├── app/api/                    # Next.js Route Handlers (um route.ts por recurso)
+│   ├── account/general/change-display-name/
+│   ├── auth/[...all]/
+│   ├── buckets/
+│   ├── categories/              # e [id]
+│   ├── me/
+│   └── transactions/           # e [id]
+├── controllers/                 # TransactionController, CategoryController, etc.
+├── repositories/               # TransactionRepository, CategoryRepository, etc.
+├── database/drizzle/
+│   ├── index.ts                # Cliente db
+│   ├── schema.ts               # Definição das tabelas
+│   └── migrations/
+├── mappers/                     # TransactionMapper, CategoryMapper, BucketMapper
+├── shared/
+│   ├── schemas/                # Zod (category, transaction, bucket, change-display-name, errors)
+│   └── errors/                 # UseCaseError, ResourceNotFoundError, NotAllowedError, ConflictError
+└── lib/
+    ├── better-auth/auth.ts     # Config better-auth + adapter Drizzle
+    ├── api.ts                  # Cliente ky para o frontend
+    └── safe-return/either.ts   # Either (Left/Right) — disponível para uso futuro
 ```
 
-Os handlers em `infra/http/` registram rotas OpenAPI, aplicam `requireAuth` quando necessário, instanciam o use case com o repositório e mapeiam o retorno `Either` para status HTTP e JSON.
+Cada Route Handler em `app/api/` obtém a sessão com `auth.api.getSession`, valida o input com Zod, instancia o repositório e o controller, chama o método correspondente e retorna `NextResponse.json` com o status adequado.
+
+**Nota**: As dependências Hono, `@hono/zod-openapi` e `@scalar/hono-api-reference` permanecem no `package.json` mas não são usadas na API atual (Next.js Route Handlers). Podem ser removidas ou reaproveitadas para documentação OpenAPI no futuro.
