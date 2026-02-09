@@ -7,6 +7,7 @@ const CategoryRefSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
 })
+
 const BucketRefSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),

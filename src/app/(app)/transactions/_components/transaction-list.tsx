@@ -176,7 +176,11 @@ export function TransactionList() {
                 <TableCell className="max-w-48 truncate">
                   {transaction.description ?? '—'}
                 </TableCell>
-                <TableCell>{getCategoryOrBucketLabel(transaction)}</TableCell>
+                <TableCell>
+                  <Badge variant="secondary">
+                    {getCategoryOrBucketLabel(transaction)}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatOccurredAt(transaction.occurredAt)}
                 </TableCell>

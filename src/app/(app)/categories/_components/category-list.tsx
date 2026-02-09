@@ -24,7 +24,6 @@ import {
 import { deleteCategory } from '@/http/delete-category'
 import { listCategories } from '@/http/list-categories'
 import { cn } from '@/lib/utils'
-import { getContrastTextColor } from '@/utils/get-contrast-color'
 
 import { CategoryListSkeleton } from './category-list-skeleton'
 import {
@@ -103,12 +102,16 @@ export function CategoryList() {
               className="border-border hover:bg-transparent"
             >
               <TableCell className="py-3">
-                <Badge
-                  style={{
-                    backgroundColor: category.color ?? undefined,
-                    color: getContrastTextColor(category.color ?? ''),
-                  }}
-                >
+                <Badge variant="secondary">
+                  {category.color && (
+                    <div
+                      className="size-2 rounded-full inline-block mr-1 ring-1 ring-zinc-50/30"
+                      style={{
+                        backgroundColor: category.color,
+                      }}
+                    />
+                  )}
+
                   {category.color ?? 'No color'}
                 </Badge>
               </TableCell>
