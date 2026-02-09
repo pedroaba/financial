@@ -1,0 +1,1 @@
+ALTER TABLE "finance_transactions" DROP COLUMN "notes";

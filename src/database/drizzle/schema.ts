@@ -82,6 +82,11 @@ export const financeInvestmentTransactionTypeEnum = pgEnum(
   'finance_investment_transaction_type',
   ['deposit', 'withdraw'],
 )
+export const financeTransactionTypeEnum = pgEnum('finance_transaction_type', [
+  'income',
+  'expense',
+  'savings',
+])
 
 // Finance tables (user-scoped, multi-tenant)
 export const financeCategories = pgTable(
@@ -182,12 +187,44 @@ export const financeInvestmentTransactions = pgTable(
   (_t) => [],
 )
 
+export const financeTransactions = pgTable(
+  'finance_transactions',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: financeTransactionTypeEnum('type').notNull(),
+    categoryId: uuid('category_id').references(() => financeCategories.id, {
+      onDelete: 'set null',
+    }),
+    bucketId: uuid('bucket_id').references(() => financeInvestmentBuckets.id, {
+      onDelete: 'set null',
+    }),
+    amount: decimal('amount', { precision: 14, scale: 2 }).notNull(),
+    description: text('description'),
+    occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull(),
+    merchant: text('merchant'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (t) => [
+    index('finance_transactions_user_occurred_idx').on(t.userId, t.occurredAt),
+    index('finance_transactions_user_category_idx').on(t.userId, t.categoryId),
+    index('finance_transactions_user_bucket_idx').on(t.userId, t.bucketId),
+  ],
+)
+
 // Relations
 export const financeCategoriesRelations = relations(
   financeCategories,
   ({ one, many }) => ({
     user: one(users),
     expenses: many(financeExpenses),
+    accountTransactions: many(financeTransactions),
   }),
 )
 export const financeExpensesRelations = relations(
@@ -202,12 +239,21 @@ export const financeInvestmentBucketsRelations = relations(
   ({ one, many }) => ({
     user: one(users),
     transactions: many(financeInvestmentTransactions),
+    accountTransactions: many(financeTransactions),
   }),
 )
 export const financeInvestmentTransactionsRelations = relations(
   financeInvestmentTransactions,
   ({ one }) => ({
     user: one(users),
+    bucket: one(financeInvestmentBuckets),
+  }),
+)
+export const financeTransactionsRelations = relations(
+  financeTransactions,
+  ({ one }) => ({
+    user: one(users),
+    category: one(financeCategories),
     bucket: one(financeInvestmentBuckets),
   }),
 )

@@ -24,7 +24,7 @@ import {
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/expenses', label: 'Expenses', icon: Wallet },
+  { href: '/transactions', label: 'Transactions', icon: Wallet },
   { href: '/categories', label: 'Categories', icon: Tags },
   { href: '/investments', label: 'Investments', icon: TrendingUp },
   { href: '/account-settings', label: 'Account Settings', icon: Settings },
