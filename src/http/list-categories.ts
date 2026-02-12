@@ -1,12 +1,17 @@
 import type z from 'zod'
 
 import { api } from '@/lib/api'
-import { CategoryListResponseSchema } from '@/shared/schemas/category'
+import { CategoryPaginatedResponseSchema } from '@/shared/schemas/category'
 
-type CategoryListResponse = z.infer<typeof CategoryListResponseSchema>
+type CategoryPaginatedResponse = z.infer<typeof CategoryPaginatedResponseSchema>
 
-export async function listCategories() {
-  const response = await api.get('categories').json<CategoryListResponse>()
+export async function listCategories(
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<CategoryPaginatedResponse> {
+  const response = await api
+    .get('categories', { searchParams: { page: String(page), pageSize: String(pageSize) } })
+    .json<CategoryPaginatedResponse>()
 
-  return response
+  return CategoryPaginatedResponseSchema.parse(response)
 }

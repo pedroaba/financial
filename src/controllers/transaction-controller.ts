@@ -12,6 +12,21 @@ export class TransactionController {
     return this.repository.listByUserId(userId)
   }
 
+  async listPaginated(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{
+    items: TransactionWithCategoryAndBucket[]
+    totalCount: number
+    page: number
+    pageSize: number
+  }> {
+    const { items, totalCount } =
+      await this.repository.listByUserIdPaginated(userId, page, pageSize)
+    return { items, totalCount, page, pageSize }
+  }
+
   async create(userId: string, params: CreateTransactionParams) {
     await this.repository.create(userId, params)
   }

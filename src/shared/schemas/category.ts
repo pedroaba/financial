@@ -42,6 +42,16 @@ export type UpdateCategoryParams = z.infer<typeof UpdateCategoryParamsSchema>
 
 export const CategoryListResponseSchema = z.array(CategorySchema)
 
+export const CategoryPaginatedResponseSchema = z.object({
+  items: z.array(CategorySchema),
+  totalCount: z.number(),
+  page: z.number(),
+  pageSize: z.number(),
+})
+export type CategoryPaginatedResponse = z.infer<
+  typeof CategoryPaginatedResponseSchema
+>
+
 export const CategoryIdParamsSchema = z.object({
   id: z.string().uuid(),
 })

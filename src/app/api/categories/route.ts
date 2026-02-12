@@ -6,7 +6,25 @@ import { auth } from '@/lib/better-auth/auth'
 import { CategoryRepository } from '@/repositories/category'
 import { CreateCategoryParamsSchema } from '@/shared/schemas/category'
 
-export async function GET() {
+const DEFAULT_PAGE_SIZE = 10
+const MAX_PAGE_SIZE = 50
+
+function parsePaginationParams(request: Request): {
+  page: number
+  pageSize: number
+} {
+  const url = new URL(request.url)
+  const pageParam = url.searchParams.get('page')
+  const pageSizeParam = url.searchParams.get('pageSize')
+  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1)
+  const pageSize = Math.min(
+    MAX_PAGE_SIZE,
+    Math.max(1, parseInt(pageSizeParam ?? String(DEFAULT_PAGE_SIZE), 10) || DEFAULT_PAGE_SIZE),
+  )
+  return { page, pageSize }
+}
+
+export async function GET(request: Request) {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
@@ -19,11 +37,16 @@ export async function GET() {
   }
 
   try {
+    const { page, pageSize } = parsePaginationParams(request)
     const repository = new CategoryRepository()
     const controller = new CategoryController(repository)
-    const list = await controller.list(session.user.id)
+    const result = await controller.listPaginated(
+      session.user.id,
+      page,
+      pageSize,
+    )
 
-    return NextResponse.json(list, { status: 200 })
+    return NextResponse.json(result, { status: 200 })
   } catch {
     return NextResponse.json(
       { error: 'Internal server error', message: 'Failed to list categories' },

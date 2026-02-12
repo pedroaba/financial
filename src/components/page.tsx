@@ -2,6 +2,8 @@ import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
+import { Button } from './ui/button'
+
 interface PageRootProps extends ComponentProps<'div'> {}
 
 function PageRoot({ className, ...props }: PageRootProps) {
@@ -38,8 +40,82 @@ function PageHeaderDescription({
   ...props
 }: PageHeaderDescriptionProps) {
   return (
-    <p className={cn('mt-1 text-sm text-muted-foreground', className)} {...props} />
+    <p
+      className={cn('mt-1 text-sm text-muted-foreground', className)}
+      {...props}
+    />
   )
+}
+
+type PageListRootProps = ComponentProps<'div'>
+
+function PageListRoot({ className, ...props }: PageListRootProps) {
+  return <div className={cn('space-y-4 mt-4', className)} {...props} />
+}
+
+type PageListTableContainerProps = ComponentProps<'div'>
+
+function PageListTableContainer({
+  className,
+  ...props
+}: PageListTableContainerProps) {
+  return (
+    <div
+      className={cn(
+        'overflow-hidden rounded border border-border bg-card/50',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+type PageListPaginationRootProps = ComponentProps<'div'>
+
+function PageListPaginationRoot({
+  className,
+  ...props
+}: PageListPaginationRootProps) {
+  return (
+    <div
+      className={cn('flex items-center justify-between', className)}
+      {...props}
+    />
+  )
+}
+
+type PageListPaginationCurrentPageProps = ComponentProps<'div'>
+
+function PageListPaginationCurrentPage({
+  className,
+  ...props
+}: PageListPaginationCurrentPageProps) {
+  return (
+    <div
+      className={cn('text-muted-foreground text-sm', className)}
+      {...props}
+    />
+  )
+}
+
+type PageListPaginationActionsWrapperProps = ComponentProps<'div'>
+
+function PageListPaginationActionsWrapper({
+  className,
+  ...props
+}: PageListPaginationActionsWrapperProps) {
+  return (
+    <div className={cn('flex items-center space-x-2', className)} {...props} />
+  )
+}
+
+type PageListPaginationActionProps = ComponentProps<typeof Button>
+
+function PageListPaginationAction({
+  className,
+  ...props
+}: PageListPaginationActionProps) {
+  return <Button variant="outline" className={className} {...props} />
 }
 
 export const PageHeader = {
@@ -54,4 +130,16 @@ export const Page = {
   Header: PageHeaderRoot,
   Title: PageHeaderTitle,
   Description: PageHeaderDescription,
+}
+
+export const PageList = {
+  Root: PageListRoot,
+  TableContainer: PageListTableContainer,
+}
+
+export const PageListPagination = {
+  Root: PageListPaginationRoot,
+  CurrentPage: PageListPaginationCurrentPage,
+  ActionsWrapper: PageListPaginationActionsWrapper,
+  Action: PageListPaginationAction,
 }

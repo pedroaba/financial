@@ -19,7 +19,9 @@ function ToolbarTitle({ className, ...props }: ToolbarTitleProps) {
 interface ToolbarDescriptionProps extends ComponentProps<'p'> {}
 
 function ToolbarDescription({ className, ...props }: ToolbarDescriptionProps) {
-  return <p className={cn('text-sm text-muted-foreground', className)} {...props} />
+  return (
+    <p className={cn('text-sm text-muted-foreground', className)} {...props} />
+  )
 }
 
 interface ToolbarContentProps extends ComponentProps<'div'> {}

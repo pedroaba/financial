@@ -25,10 +25,12 @@ export function CategorySelector({
   className,
   id,
 }: CategorySelectorProps) {
-  const { data: categories = [], isLoading } = useQuery({
-    queryKey: ['categories'],
-    queryFn: listCategories,
+  const { data, isLoading } = useQuery({
+    queryKey: ['categories', 1, 100],
+    queryFn: () => listCategories(1, 100),
   })
+
+  const categories = data?.items ?? []
 
   const filteredCategories = React.useMemo(
     () => (kind ? categories.filter((c) => c.kind === kind) : categories),

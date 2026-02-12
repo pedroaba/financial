@@ -80,3 +80,13 @@ export const TransactionIdParamsSchema = z.object({
 export const TransactionListResponseSchema = z.array(
   TransactionWithCategoryAndBucketSchema,
 )
+
+export const TransactionPaginatedResponseSchema = z.object({
+  items: z.array(TransactionWithCategoryAndBucketSchema),
+  totalCount: z.number(),
+  page: z.number(),
+  pageSize: z.number(),
+})
+export type TransactionPaginatedResponse = z.infer<
+  typeof TransactionPaginatedResponseSchema
+>

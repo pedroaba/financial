@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 
 import { db } from '@/database/drizzle'
 import {
@@ -12,6 +12,8 @@ import type {
   TransactionWithCategoryAndBucket,
   UpdateTransactionParams,
 } from '@/shared/schemas/transaction'
+
+const MAX_PAGE_SIZE = 50
 
 export class TransactionRepository {
   async listByUserId(
@@ -66,6 +68,80 @@ export class TransactionRepository {
     }))
 
     return mapped.map(TransactionMapper.toResponse)
+  }
+
+  async listByUserIdPaginated(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{
+    items: TransactionWithCategoryAndBucket[]
+    totalCount: number
+  }> {
+    const safePageSize = Math.min(
+      Math.max(1, pageSize),
+      MAX_PAGE_SIZE,
+    ) as number
+    const offset = (Math.max(1, page) - 1) * safePageSize
+
+    const [countResult, rows] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(financeTransactions)
+        .where(eq(financeTransactions.userId, userId)),
+      db
+        .select({
+          id: financeTransactions.id,
+          userId: financeTransactions.userId,
+          type: financeTransactions.type,
+          categoryId: financeTransactions.categoryId,
+          bucketId: financeTransactions.bucketId,
+          amount: financeTransactions.amount,
+          description: financeTransactions.description,
+          occurredAt: financeTransactions.occurredAt,
+          merchant: financeTransactions.merchant,
+          createdAt: financeTransactions.createdAt,
+          updatedAt: financeTransactions.updatedAt,
+          categoryIdJoin: financeCategories.id,
+          categoryName: financeCategories.name,
+          bucketIdJoin: financeInvestmentBuckets.id,
+          bucketName: financeInvestmentBuckets.name,
+        })
+        .from(financeTransactions)
+        .leftJoin(
+          financeCategories,
+          eq(financeTransactions.categoryId, financeCategories.id),
+        )
+        .leftJoin(
+          financeInvestmentBuckets,
+          eq(financeTransactions.bucketId, financeInvestmentBuckets.id),
+        )
+        .where(eq(financeTransactions.userId, userId))
+        .orderBy(desc(financeTransactions.occurredAt))
+        .limit(safePageSize)
+        .offset(offset),
+    ])
+
+    const totalCount = Number(countResult[0]?.count ?? 0)
+    const mapped: TransactionListRow[] = rows.map((r) => ({
+      id: r.id,
+      userId: r.userId,
+      type: r.type,
+      categoryId: r.categoryId,
+      bucketId: r.bucketId,
+      amount: String(r.amount),
+      description: r.description,
+      occurredAt: r.occurredAt,
+      merchant: r.merchant,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+      categoryIdJoin: r.categoryIdJoin,
+      categoryName: r.categoryName,
+      bucketIdJoin: r.bucketIdJoin,
+      bucketName: r.bucketName,
+    }))
+    const items = mapped.map(TransactionMapper.toResponse)
+    return { items, totalCount }
   }
 
   async create(userId: string, params: CreateTransactionParams) {
